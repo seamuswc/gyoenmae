@@ -40,7 +40,7 @@ towa/
 │   ├── i18n.js         # all text (EN + JA) + SEO metadata
 │   └── main.js         # hero carousel (reads photos.json)
 ├── photos/             # image files
-├── admin/              # password-protected photo admin UI
+├── adminphotos/        # password-protected photo admin UI
 ├── server/             # Node API (Express + multer)
 └── deploy/             # nginx + systemd configs
 ```
@@ -49,7 +49,7 @@ towa/
 
 ## Add or change photos (admin)
 
-**URL:** `/admin` on the deployed server (e.g. `http://167.172.79.34/admin`).
+**URL:** `/adminphotos` on the deployed server (e.g. `http://167.172.79.34/adminphotos`).
 
 Sign in with the nginx Basic Auth credentials (stored only on the server at `/etc/nginx/.htpasswd`).
 
@@ -134,7 +134,7 @@ The site remembers the last choice in the browser. SEO tags (`hreflang`, Open Gr
 
 ## Admin API
 
-Mutating endpoints (`POST`, `PUT`, `DELETE` under `/api/`) are protected by the same nginx Basic Auth as `/admin`. `GET /photos.json` is public so the hero carousel loads without hitting Node.
+Mutating endpoints (`POST`, `PUT`, `DELETE` under `/api/`) are protected by the same nginx Basic Auth as `/adminphotos`. `GET /photos.json` is public so the hero carousel loads without hitting Node.
 
 ---
 
@@ -153,7 +153,7 @@ Then connect the repo to DigitalOcean for deploys on push.
 
 ## Checklist before going live
 
-- [ ] Replace placeholder photos via `/admin` or `photos/` + `photos.json`
+- [ ] Replace placeholder photos via `/adminphotos` or `photos/` + `photos.json`
 - [ ] Confirm rent, deposit, and terms in `js/i18n.js`
 - [ ] Confirm LINE link and QR in footer
 - [ ] Test both languages (top-left toggle)
