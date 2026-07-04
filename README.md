@@ -109,6 +109,16 @@ The site remembers the last choice in the browser. SEO tags (`hreflang`, Open Gr
 
 ---
 
+## Admin (password-protected)
+
+**URL:** `/admin` on the deployed server (e.g. `http://167.172.79.34/admin`).
+
+Access is enforced by nginx HTTP Basic Auth. Credentials are stored only on the server at `/etc/nginx/.htpasswd` — they are never committed to git.
+
+The admin page is a v1 shell for future photo management. Edit `admin/index.html` locally and redeploy the `admin/` folder to update it.
+
+---
+
 ## Git (optional)
 
 ```bash
