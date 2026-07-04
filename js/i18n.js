@@ -1,6 +1,9 @@
 (function () {
   const STORAGE_KEY = 'towa-lang';
-  const MAPS_URL = 'https://www.google.com/maps/search/?api=1&query=35.68861860338855,139.70958883013597';
+  const MAPS_QUERY = '〒160-0022 東京都新宿区新宿２丁目１ 藤和新宿御苑コープII';
+  const MAPS_LAT = 35.68861860338855;
+  const MAPS_LNG = 139.70958883013597;
+  const MAPS_URL = 'https://www.google.com/maps/place/' + encodeURIComponent(MAPS_QUERY) + '/@' + MAPS_LAT + ',' + MAPS_LNG + ',18z';
 
   const translations = {
     en: {
@@ -9,7 +12,7 @@
       ogLocale: 'en_US',
       eyebrow: 'Shinjuku Gyoen · Fixed-term rental',
       heroSub: '48 sqm · 8th floor · Back alley view · ¥200,000 / month',
-      heroAddress: '〒160-0022 Tokyo, Shinjuku City, Shinjuku, 2-chōme−1 ↗',
+      heroAddress: '〒160-0022 東京都新宿区新宿２丁目１ 藤和新宿御苑コープII ↗',
       property: 'Property',
       building: 'Building',
       rent: 'Rent',
@@ -21,7 +24,7 @@
       view: 'View',
       viewValue: 'Back alley',
       address: 'Address',
-      addressBlock: '〒160-0022<br>Tokyo, Shinjuku City, Shinjuku, 2-chōme−1<br>藤和新宿御苑コープII<br><a href="' + MAPS_URL + '" class="map-link" target="_blank" rel="noopener noreferrer">View on Google Maps ↗</a>',
+      addressBlock: '〒160-0022<br>東京都新宿区新宿２丁目１<br>藤和新宿御苑コープII<br><a href="' + MAPS_URL + '" class="map-link" target="_blank" rel="noopener noreferrer">View on Google Maps ↗</a>',
       about: 'About the unit',
       location: 'Literally right next to Gyoen-mae Station, with Shinjuku Gyoen park about a 30-second walk away.',
       amenity0: 'No key — electronic keypad entry.',
@@ -62,7 +65,7 @@
       ogLocale: 'ja_JP',
       eyebrow: '新宿御苑 · 定期借家',
       heroSub: '48㎡ · 8階 · 裏通り向き · 月額¥200,000',
-      heroAddress: '〒160-0022 東京都新宿区新宿2丁目1 ↗',
+      heroAddress: '〒160-0022 東京都新宿区新宿２丁目１ 藤和新宿御苑コープII ↗',
       property: '物件情報',
       building: '建物名',
       rent: '家賃',
@@ -74,7 +77,7 @@
       view: '眺望',
       viewValue: '裏通り',
       address: '住所',
-      addressBlock: '〒160-0022<br>東京都新宿区新宿2丁目1<br>藤和新宿御苑コープII<br><a href="' + MAPS_URL + '" class="map-link" target="_blank" rel="noopener noreferrer">Googleマップで見る ↗</a>',
+      addressBlock: '〒160-0022<br>東京都新宿区新宿２丁目１<br>藤和新宿御苑コープII<br><a href="' + MAPS_URL + '" class="map-link" target="_blank" rel="noopener noreferrer">Googleマップで見る ↗</a>',
       about: 'お部屋について',
       location: '新宿御苑前駅のすぐ隣。新宿御苑まで徒歩約30秒です。',
       amenity0: '鍵なし。電子キーパッドで入室。',
@@ -210,7 +213,7 @@
             floorLevel: 8,
             address: {
               '@type': 'PostalAddress',
-              streetAddress: '新宿2丁目1 藤和新宿御苑コープII',
+              streetAddress: '新宿２丁目１ 藤和新宿御苑コープII',
               addressLocality: '新宿区',
               addressRegion: '東京都',
               postalCode: '160-0022',
@@ -253,6 +256,10 @@
     document.documentElement.lang = lang;
     document.title = t('title');
     updateSeoMeta(lang);
+
+    document.querySelectorAll('[data-maps-link]').forEach(function (el) {
+      el.href = MAPS_URL;
+    });
 
     document.querySelectorAll('[data-i18n]').forEach(function (el) {
       el.textContent = t(el.getAttribute('data-i18n'));
