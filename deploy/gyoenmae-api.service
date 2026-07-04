@@ -1,0 +1,17 @@
+[Unit]
+Description=Gyoenmae photo management API
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/gyoenmae/server
+Environment=SITE_ROOT=/var/www/gyoenmae
+Environment=PORT=3000
+ExecStart=/usr/bin/node index.js
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

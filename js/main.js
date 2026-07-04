@@ -1,26 +1,44 @@
 (function () {
-  const photoKeys = ['photo1', 'photo2', 'photo3', 'photo4', 'photo5', 'photo6'];
-  const photos = [
-    { src: 'photos/01-living.svg' },
-    { src: 'photos/02-kitchen.svg' },
-    { src: 'photos/03-bedroom.svg' },
-    { src: 'photos/04-view.svg' },
-    { src: 'photos/05-bathroom.svg' },
-    { src: 'photos/06-building.svg' }
+  const FALLBACK_PHOTOS = [
+    { filename: '01-living.svg', altKey: 'photo1' },
+    { filename: '02-kitchen.svg', altKey: 'photo2' },
+    { filename: '03-bedroom.svg', altKey: 'photo3' },
+    { filename: '04-view.svg', altKey: 'photo4' },
+    { filename: '05-bathroom.svg', altKey: 'photo5' },
+    { filename: '06-building.svg', altKey: 'photo6' }
   ];
+
+  const FALLBACK_KEYS = ['photo1', 'photo2', 'photo3', 'photo4', 'photo5', 'photo6'];
 
   const heroImage = document.getElementById('hero-image');
   const prevBtn = document.getElementById('hero-prev');
   const nextBtn = document.getElementById('hero-next');
   const counter = document.getElementById('hero-counter');
 
-  if (!heroImage || !photos.length) return;
+  if (!heroImage || !prevBtn || !nextBtn) return;
 
+  let photos = [];
   let current = 0;
+  let ready = false;
+
+  function photoSrc(entry) {
+    return 'photos/' + entry.filename;
+  }
 
   function photoAlt(index) {
-    if (window.towaI18n) return window.towaI18n.t(photoKeys[index]);
-    return '';
+    const entry = photos[index];
+    if (!entry) return '';
+    if (entry.alt && window.towaI18n) {
+      const lang = window.towaI18n.getLang ? window.towaI18n.getLang() : 'en';
+      return entry.alt[lang] || entry.alt.en || '';
+    }
+    if (entry.altKey && window.towaI18n) {
+      return window.towaI18n.t(entry.altKey);
+    }
+    if (window.towaI18n && FALLBACK_KEYS[index]) {
+      return window.towaI18n.t(FALLBACK_KEYS[index]);
+    }
+    return 'Photo ' + (index + 1);
   }
 
   function updateAriaLabels() {
@@ -30,28 +48,64 @@
   }
 
   function show(index) {
+    if (!photos.length) return;
     current = (index + photos.length) % photos.length;
-    const photo = photos[current];
-    heroImage.style.backgroundImage = "url('" + photo.src + "')";
+    heroImage.style.backgroundImage = "url('" + photoSrc(photos[current]) + "')";
     heroImage.setAttribute('aria-label', photoAlt(current));
     if (counter) {
       counter.textContent = (current + 1) + ' / ' + photos.length;
     }
   }
 
-  prevBtn.addEventListener('click', function () { show(current - 1); });
-  nextBtn.addEventListener('click', function () { show(current + 1); });
+  function bindControls() {
+    if (ready) return;
+    ready = true;
 
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'ArrowLeft') show(current - 1);
-    if (e.key === 'ArrowRight') show(current + 1);
-  });
+    prevBtn.addEventListener('click', function () { show(current - 1); });
+    nextBtn.addEventListener('click', function () { show(current + 1); });
 
-  document.addEventListener('languagechange', function () {
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowLeft') show(current - 1);
+      if (e.key === 'ArrowRight') show(current + 1);
+    });
+
+    document.addEventListener('languagechange', function () {
+      updateAriaLabels();
+      show(current);
+    });
+
     updateAriaLabels();
-    show(current);
-  });
+    show(0);
+  }
 
-  updateAriaLabels();
-  show(0);
+  function normalizeList(data) {
+    if (!Array.isArray(data) || !data.length) return null;
+    return data.map(function (item) {
+      if (typeof item === 'string') return { filename: item };
+      if (item && item.filename) return item;
+      return null;
+    }).filter(Boolean);
+  }
+
+  function start(list) {
+    photos = list;
+    bindControls();
+  }
+
+  fetch('/photos.json', { cache: 'no-store' })
+    .then(function (res) {
+      if (!res.ok) throw new Error('not found');
+      return res.json();
+    })
+    .then(function (data) {
+      const list = normalizeList(data);
+      if (list && list.length) {
+        start(list);
+      } else {
+        start(FALLBACK_PHOTOS.slice());
+      }
+    })
+    .catch(function () {
+      start(FALLBACK_PHOTOS.slice());
+    });
 })();

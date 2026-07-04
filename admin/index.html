@@ -8,145 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #f7f4ef;
-      --surface: #ffffff;
-      --ink: #1a1814;
-      --muted: #5c574f;
-      --accent: #2d4a3e;
-      --accent-light: #e8efe9;
-      --border: #ddd6cb;
-      --shadow: 0 12px 40px rgba(26, 24, 20, 0.08);
-      --radius: 12px;
-      --font-serif: "Source Serif 4", Georgia, serif;
-      --font-sans: "Noto Sans JP", system-ui, sans-serif;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: var(--font-sans);
-      font-size: 1rem;
-      line-height: 1.6;
-      color: var(--ink);
-      background: var(--bg);
-    }
-
-    .wrap {
-      width: min(720px, 92vw);
-      margin: 0 auto;
-      padding: 3rem 0 4rem;
-    }
-
-    header {
-      margin-bottom: 2.5rem;
-    }
-
-    h1 {
-      font-family: var(--font-serif);
-      font-weight: 600;
-      font-size: 2rem;
-      margin: 0 0 0.5rem;
-    }
-
-    .status {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.875rem;
-      color: var(--accent);
-      background: var(--accent-light);
-      padding: 0.35rem 0.75rem;
-      border-radius: 999px;
-    }
-
-    .status::before {
-      content: "";
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--accent);
-    }
-
-    section {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 1.5rem 1.75rem;
-      margin-bottom: 1.25rem;
-    }
-
-    h2 {
-      font-family: var(--font-serif);
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin: 0 0 1rem;
-    }
-
-    .note {
-      font-size: 0.9rem;
-      color: var(--muted);
-      margin: 0 0 1rem;
-    }
-
-    ul.photos {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-
-    ul.photos li {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 0.75rem 0;
-      border-bottom: 1px solid var(--border);
-    }
-
-    ul.photos li:last-child {
-      border-bottom: none;
-    }
-
-    .thumb {
-      width: 64px;
-      height: 48px;
-      object-fit: cover;
-      border-radius: 6px;
-      border: 1px solid var(--border);
-      background: var(--bg);
-    }
-
-    .photo-name {
-      font-family: ui-monospace, monospace;
-      font-size: 0.875rem;
-    }
-
-    .order {
-      margin-left: auto;
-      font-size: 0.8rem;
-      color: var(--muted);
-    }
-
-    .placeholder-actions {
-      margin-top: 1rem;
-      padding-top: 1rem;
-      border-top: 1px solid var(--border);
-      font-size: 0.875rem;
-      color: var(--muted);
-    }
-
-    footer {
-      margin-top: 2rem;
-      font-size: 0.875rem;
-    }
-
-    footer a {
-      color: var(--accent);
-    }
-  </style>
+  <link rel="stylesheet" href="admin.css">
 </head>
 <body>
   <div class="wrap">
@@ -156,46 +18,23 @@
     </header>
 
     <section>
-      <h2>Photos</h2>
-      <p class="note">Current gallery images served from <code>photos/</code>. Upload and reorder API coming in a later version.</p>
-      <ul class="photos" id="photo-list">
-        <li>
-          <img class="thumb" src="../photos/01-living.svg" alt="" width="64" height="48">
-          <span class="photo-name">01-living.svg</span>
-          <span class="order">#1</span>
-        </li>
-        <li>
-          <img class="thumb" src="../photos/02-kitchen.svg" alt="" width="64" height="48">
-          <span class="photo-name">02-kitchen.svg</span>
-          <span class="order">#2</span>
-        </li>
-        <li>
-          <img class="thumb" src="../photos/03-bedroom.svg" alt="" width="64" height="48">
-          <span class="photo-name">03-bedroom.svg</span>
-          <span class="order">#3</span>
-        </li>
-        <li>
-          <img class="thumb" src="../photos/04-view.svg" alt="" width="64" height="48">
-          <span class="photo-name">04-view.svg</span>
-          <span class="order">#4</span>
-        </li>
-        <li>
-          <img class="thumb" src="../photos/05-bathroom.svg" alt="" width="64" height="48">
-          <span class="photo-name">05-bathroom.svg</span>
-          <span class="order">#5</span>
-        </li>
-        <li>
-          <img class="thumb" src="../photos/06-building.svg" alt="" width="64" height="48">
-          <span class="photo-name">06-building.svg</span>
-          <span class="order">#6</span>
-        </li>
-      </ul>
-      <p class="placeholder-actions">Upload · reorder · delete — not yet available</p>
+      <h2>Carousel photos</h2>
+      <p class="note">Drag to reorder, or use ↑ ↓. Changes apply to the public hero carousel after you save order, upload, or delete.</p>
+      <div id="message" class="message" role="status" aria-live="polite"></div>
+      <ul class="photos" id="photo-list"></ul>
+      <div class="toolbar">
+        <button type="button" class="btn btn-primary" id="save-order-btn" disabled>Order saved</button>
+      </div>
+      <div class="upload-row">
+        <input type="file" id="upload-input" accept=".jpg,.jpeg,.png,.webp,.svg,image/jpeg,image/png,image/webp,image/svg+xml">
+        <button type="button" class="btn btn-primary" id="upload-btn">Upload photo</button>
+      </div>
     </section>
 
     <footer>
       <a href="/">← Back to site</a>
     </footer>
   </div>
+  <script src="admin.js"></script>
 </body>
 </html>

@@ -1,12 +1,14 @@
 # Towa — rental listing site
 
-Static one-page site for **藤和新宿御苑コープII**. No build step, no admin panel, no database.
+One-page site for **藤和新宿御苑コープII**. English / 日本語 toggle built in.
 
-English / 日本語 toggle built in.
+The public site is static. Photo carousel order is managed via a password-protected admin UI backed by a small Node API on the server.
 
 ---
 
 ## Quick start (local preview)
+
+**Static site only** (uses `photos.json` in the repo):
 
 ```bash
 cd towa
@@ -15,38 +17,49 @@ python3 -m http.server 8080
 
 Open **http://localhost:8080**
 
+**With admin API** (upload / reorder / delete):
+
+```bash
+cd towa/server
+npm install
+npm start
+```
+
+In another terminal, serve the site root (API runs on port 3000; static files on 8080). For full admin locally, use a reverse proxy or test on the deployed server.
+
 ---
 
 ## Project layout
 
 ```
 towa/
-├── index.html      # page structure
-├── css/style.css   # styles
+├── index.html          # page structure
+├── photos.json         # public carousel manifest (written by API on server)
+├── css/style.css       # styles
 ├── js/
-│   ├── i18n.js     # all text (EN + JA) + SEO metadata
-│   └── main.js     # hero photo carousel
-└── photos/         # images (drop files here)
+│   ├── i18n.js         # all text (EN + JA) + SEO metadata
+│   └── main.js         # hero carousel (reads photos.json)
+├── photos/             # image files
+├── admin/              # password-protected photo admin UI
+├── server/             # Node API (Express + multer)
+└── deploy/             # nginx + systemd configs
 ```
 
 ---
 
-## Add or change photos
+## Add or change photos (admin)
 
-1. Put your images in `photos/` (`.jpg`, `.png`, or `.webp` recommended).
-2. Open `js/main.js` and update the `photos` array:
+**URL:** `/admin` on the deployed server (e.g. `http://167.172.79.34/admin`).
 
-```js
-const photos = [
-  { src: 'photos/01-living.jpg' },
-  { src: 'photos/02-kitchen.jpg' },
-  // add more as needed
-];
-```
+Sign in with the nginx Basic Auth credentials (stored only on the server at `/etc/nginx/.htpasswd`).
 
-The hero uses left/right arrows (or keyboard ← →) to cycle through them. Order in the array = display order.
+1. **Upload** — choose a `.jpg`, `.png`, `.webp`, or `.svg` (max 10 MB) and click **Upload photo**. New images appear at the end of the list.
+2. **Reorder** — drag rows or use ↑ ↓, then click **Save order**. The public hero carousel updates immediately.
+3. **Delete** — click **Delete** on a row and confirm. The file is removed from the server.
 
-Replace `photos/line-qr.png` to update the LINE QR code in the footer.
+The public site reads `/photos.json` (no login required). The API writes that file whenever photos change.
+
+Replace `photos/line-qr.png` manually to update the LINE QR code in the footer (not part of the carousel).
 
 ---
 
@@ -80,21 +93,31 @@ https://line.me/ti/p/4zgIBrGzGk
 
 ---
 
-## Deploy on DigitalOcean
+## Deploy (DigitalOcean droplet)
 
-Easiest: **App Platform → Static Site**.
+Production runs at **167.172.79.34** with nginx + systemd.
 
-1. Push this folder to GitHub (or GitLab).
-2. In DigitalOcean: **Create App → Static Site**.
-3. Connect the repo.
-4. Settings:
-   - **Build command:** leave empty
-   - **Output directory:** `/` (repo root)
-5. Deploy.
+```bash
+# From your machine (rsync site files; excludes node_modules)
+rsync -avz --exclude node_modules --exclude .git \
+  ./ root@167.172.79.34:/var/www/gyoenmae/
 
-No Node, npm, or build required.
+# On the server
+ssh root@167.172.79.34
+cd /var/www/gyoenmae/server && npm install
+cp /var/www/gyoenmae/deploy/gyoenmae-api.service /etc/systemd/system/
+cp /var/www/gyoenmae/deploy/nginx-gyoenmae.conf /etc/nginx/sites-available/gyoenmae
+systemctl daemon-reload
+systemctl enable --now gyoenmae-api
+nginx -t && systemctl reload nginx
+```
 
-**Custom domain:** add it in App Platform → Settings → Domains. HTTPS is automatic.
+Ensure `www-data` can write `photos/` and `photos.json`:
+
+```bash
+chown -R www-data:www-data /var/www/gyoenmae/photos /var/www/gyoenmae/photos.json
+chown -R www-data:www-data /var/www/gyoenmae/server
+```
 
 ---
 
@@ -109,13 +132,9 @@ The site remembers the last choice in the browser. SEO tags (`hreflang`, Open Gr
 
 ---
 
-## Admin (password-protected)
+## Admin API
 
-**URL:** `/admin` on the deployed server (e.g. `http://167.172.79.34/admin`).
-
-Access is enforced by nginx HTTP Basic Auth. Credentials are stored only on the server at `/etc/nginx/.htpasswd` — they are never committed to git.
-
-The admin page is a v1 shell for future photo management. Edit `admin/index.html` locally and redeploy the `admin/` folder to update it.
+Mutating endpoints (`POST`, `PUT`, `DELETE` under `/api/`) are protected by the same nginx Basic Auth as `/admin`. `GET /photos.json` is public so the hero carousel loads without hitting Node.
 
 ---
 
@@ -134,7 +153,7 @@ Then connect the repo to DigitalOcean for deploys on push.
 
 ## Checklist before going live
 
-- [ ] Replace placeholder photos in `photos/` and `js/main.js`
+- [ ] Replace placeholder photos via `/admin` or `photos/` + `photos.json`
 - [ ] Confirm rent, deposit, and terms in `js/i18n.js`
 - [ ] Confirm LINE link and QR in footer
 - [ ] Test both languages (top-left toggle)

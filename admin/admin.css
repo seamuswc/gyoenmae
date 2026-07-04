@@ -1,0 +1,268 @@
+:root {
+  --bg: #f7f4ef;
+  --surface: #ffffff;
+  --ink: #1a1814;
+  --muted: #5c574f;
+  --accent: #2d4a3e;
+  --accent-light: #e8efe9;
+  --danger: #8b2e2e;
+  --danger-light: #f9ecec;
+  --border: #ddd6cb;
+  --shadow: 0 12px 40px rgba(26, 24, 20, 0.08);
+  --radius: 12px;
+  --font-serif: "Source Serif 4", Georgia, serif;
+  --font-sans: "Noto Sans JP", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--ink);
+  background: var(--bg);
+}
+
+.wrap {
+  width: min(720px, 92vw);
+  margin: 0 auto;
+  padding: 3rem 0 4rem;
+}
+
+header {
+  margin-bottom: 2.5rem;
+}
+
+h1 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 2rem;
+  margin: 0 0 0.5rem;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+}
+
+.status::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 1.25rem;
+}
+
+h2 {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 1rem;
+}
+
+.note {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin: 0 0 1rem;
+}
+
+.message {
+  font-size: 0.9rem;
+  padding: 0.65rem 0.9rem;
+  border-radius: 8px;
+  margin: 0 0 1rem;
+  display: none;
+}
+
+.message.visible {
+  display: block;
+}
+
+.message.success {
+  color: var(--accent);
+  background: var(--accent-light);
+}
+
+.message.error {
+  color: var(--danger);
+  background: var(--danger-light);
+}
+
+.message.info {
+  color: var(--muted);
+  background: var(--bg);
+}
+
+ul.photos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+ul.photos li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  background: var(--bg);
+  cursor: grab;
+  transition: box-shadow 0.15s, opacity 0.15s;
+}
+
+ul.photos li:active {
+  cursor: grabbing;
+}
+
+ul.photos li.dragging {
+  opacity: 0.45;
+}
+
+ul.photos li.drag-over {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+ul.photos:empty::after {
+  content: "No photos yet — upload one below.";
+  display: block;
+  color: var(--muted);
+  font-size: 0.9rem;
+  padding: 1rem 0;
+}
+
+.drag-handle {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: 1.1rem;
+  line-height: 1;
+  user-select: none;
+  padding: 0 0.15rem;
+}
+
+.thumb {
+  width: 72px;
+  height: 54px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+}
+
+.photo-name {
+  font-family: ui-monospace, monospace;
+  font-size: 0.8rem;
+  word-break: break-all;
+  flex: 1;
+  min-width: 0;
+}
+
+.order-badge {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.15rem 0.5rem;
+}
+
+.photo-actions {
+  display: flex;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.btn {
+  font-family: inherit;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+  padding: 0.35rem 0.6rem;
+  cursor: pointer;
+  line-height: 1.3;
+}
+
+.btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-danger {
+  color: var(--danger);
+  border-color: #e0c4c4;
+}
+
+.btn-danger:hover {
+  background: var(--danger-light);
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: #243d33;
+  border-color: #243d33;
+  color: #fff;
+}
+
+.upload-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+}
+
+.upload-row input[type="file"] {
+  font-size: 0.875rem;
+  max-width: 100%;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.75rem;
+}
+
+footer {
+  margin-top: 2rem;
+  font-size: 0.875rem;
+}
+
+footer a {
+  color: var(--accent);
+}
