@@ -8,17 +8,17 @@
   const translations = {
     en: {
       title: '藤和新宿御苑コープII — Towa',
-      metaDescription: '48 sqm apartment, 8th floor, 藤和新宿御苑コープII. ¥200,000/month. 〒160-0022 Tokyo, Shinjuku City, Shinjuku, 2-chōme−1. Fixed-term rental — 6 months or 1 year.',
+      metaDescription: '45 sqm apartment, 8th floor, 藤和新宿御苑コープII. ¥200,000/month. 〒160-0022 Tokyo, Shinjuku City, Shinjuku, 2-chōme−1. Fixed-term rental — 6 months or 1 year.',
       ogLocale: 'en_US',
       eyebrow: 'Shinjuku Gyoen · Fixed-term rental',
-      heroSub: '48 sqm · 8th floor · Back alley view · ¥200,000 / month',
+      heroSub: '45 sqm · 8th floor · Back alley view · ¥200,000 / month',
       heroAddress: '〒160-0022 東京都新宿区新宿２丁目１ 藤和新宿御苑コープII ↗',
       property: 'Property',
       building: 'Building',
       rent: 'Rent',
       rentValue: '¥200,000 / month',
       size: 'Size',
-      sizeValue: '48 sqm',
+      sizeValue: '45 sqm',
       floor: 'Floor',
       floorValue: '8th floor',
       view: 'View',
@@ -57,21 +57,21 @@
       photo4: 'Back alley view from window',
       photo5: 'Bathroom',
       photo6: 'Building exterior',
-      schemaDescription: '48 sqm fixed-term rental apartment on the 8th floor near Shinjuku Gyoen Station. ¥200,000/month, utilities included, 6-month or 1-year lease.'
+      schemaDescription: '45 sqm fixed-term rental apartment on the 8th floor near Shinjuku Gyoen Station. ¥200,000/month, utilities included, 6-month or 1-year lease.'
     },
     ja: {
       title: '藤和新宿御苑コープII — Towa',
-      metaDescription: '48㎡・8階・藤和新宿御苑コープII。月額¥200,000。〒160-0022 東京都新宿区新宿2丁目1。定期借家（6ヶ月・1年）。',
+      metaDescription: '45㎡・8階・藤和新宿御苑コープII。月額¥200,000。〒160-0022 東京都新宿区新宿2丁目1。定期借家（6ヶ月・1年）。',
       ogLocale: 'ja_JP',
       eyebrow: '新宿御苑 · 定期借家',
-      heroSub: '48㎡ · 8階 · 裏通り向き · 月額¥200,000',
+      heroSub: '45㎡ · 8階 · 裏通り向き · 月額¥200,000',
       heroAddress: '〒160-0022 東京都新宿区新宿２丁目１ 藤和新宿御苑コープII ↗',
       property: '物件情報',
       building: '建物名',
       rent: '家賃',
       rentValue: '月額¥200,000',
       size: '面積',
-      sizeValue: '48㎡',
+      sizeValue: '45㎡',
       floor: '階数',
       floorValue: '8階',
       view: '眺望',
@@ -110,7 +110,7 @@
       photo4: '裏通りの眺望',
       photo5: 'バスルーム',
       photo6: '建物外観',
-      schemaDescription: '新宿御苑前駅徒歩すぐ、8階・48㎡の定期借家。月額¥200,000、光熱費込み、6ヶ月または1年契約。'
+      schemaDescription: '新宿御苑前駅徒歩すぐ、8階・45㎡の定期借家。月額¥200,000、光熱費込み、6ヶ月または1年契約。'
     }
   };
 
@@ -207,7 +207,7 @@
             description: translations[lang].schemaDescription,
             floorSize: {
               '@type': 'QuantitativeValue',
-              value: 48,
+              value: 45,
               unitCode: 'MTK'
             },
             floorLevel: 8,
