@@ -31,7 +31,8 @@
   }
 
   async function api(path, options) {
-    const res = await fetch(API + (path || ''), options);
+    const opts = Object.assign({ credentials: 'include' }, options || {});
+    const res = await fetch(API + (path || ''), opts);
     const data = await res.json().catch(function () { return {}; });
     if (!res.ok) {
       throw new Error(data.error || ('Request failed (' + res.status + ')'));
