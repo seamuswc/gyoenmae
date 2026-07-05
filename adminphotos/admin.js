@@ -33,7 +33,18 @@
   async function api(path, options) {
     const opts = Object.assign({ credentials: 'include' }, options || {});
     const res = await fetch(API + (path || ''), opts);
-    const data = await res.json().catch(function () { return {}; });
+    const text = await res.text();
+    var data = {};
+    if (text) {
+      try {
+        data = JSON.parse(text);
+      } catch (_parseErr) {
+        if (!res.ok) {
+          var snippet = text.replace(/\s+/g, ' ').trim().slice(0, 120);
+          throw new Error('Request failed (' + res.status + ')' + (snippet ? ': ' + snippet : ''));
+        }
+      }
+    }
     if (!res.ok) {
       throw new Error(data.error || ('Request failed (' + res.status + ')'));
     }

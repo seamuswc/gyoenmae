@@ -46,8 +46,22 @@ function readManifest() {
 
 function writeManifest(photos) {
   const json = JSON.stringify(photos, null, 2) + '\n';
-  fs.writeFileSync(MANIFEST_PATH, json, 'utf8');
-  fs.writeFileSync(PUBLIC_MANIFEST, json, 'utf8');
+  try {
+    fs.writeFileSync(MANIFEST_PATH, json, 'utf8');
+    fs.writeFileSync(PUBLIC_MANIFEST, json, 'utf8');
+  } catch (err) {
+    if (err.code === 'EACCES') {
+      throw Object.assign(new Error('Permission denied writing photos.json (run deploy to fix ownership)'), { status: 500 });
+    }
+    throw err;
+  }
+}
+
+function apiError(err, fallback) {
+  if (err.code === 'EACCES') {
+    return 'Permission denied (photos directory or manifest not writable by API)';
+  }
+  return err.message || fallback;
 }
 
 function photoEntry(filename, extra) {
@@ -136,13 +150,17 @@ app.delete('/api/photos/:filename', function (req, res) {
   }
 
   const filePath = path.join(PHOTOS_DIR, filename);
-  if (fs.existsSync(filePath)) {
-    fs.unlinkSync(filePath);
+  try {
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+    photos.splice(index, 1);
+    writeManifest(photos);
+    res.json({ photos });
+  } catch (err) {
+    console.error(err);
+    res.status(err.status || 500).json({ error: apiError(err, 'Delete failed') });
   }
-
-  photos.splice(index, 1);
-  writeManifest(photos);
-  res.json({ photos });
 });
 
 app.put('/api/photos/order', function (req, res) {
@@ -174,7 +192,7 @@ app.put('/api/photos/order', function (req, res) {
 
 app.use(function (err, _req, res, _next) {
   console.error(err);
-  res.status(500).json({ error: 'Internal server error' });
+  res.status(err.status || 500).json({ error: apiError(err, 'Internal server error') });
 });
 
 ensureDirs();
