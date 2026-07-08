@@ -61,6 +61,25 @@ function writeManifest(photos) {
 
 const DEFAULT_STATUS = { status: 'vacant', rentedUntil: null };
 
+function validateRentedUntil(value) {
+  if (!value) return null;
+  const match = String(value).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return null;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  if (year < 2000 || year > 2099) return null;
+  const date = new Date(Date.UTC(year, month - 1, day));
+  if (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+  ) {
+    return match[1] + '-' + match[2] + '-' + match[3];
+  }
+  return null;
+}
+
 function normalizeStatus(data) {
   if (!data || typeof data !== 'object') {
     return Object.assign({}, DEFAULT_STATUS);
@@ -68,20 +87,7 @@ function normalizeStatus(data) {
   const status = data.status === 'rented' ? 'rented' : 'vacant';
   let rentedUntil = null;
   if (status === 'rented' && data.rentedUntil) {
-    const match = String(data.rentedUntil).match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if (match) {
-      const year = Number(match[1]);
-      const month = Number(match[2]);
-      const day = Number(match[3]);
-      const date = new Date(Date.UTC(year, month - 1, day));
-      if (
-        date.getUTCFullYear() === year &&
-        date.getUTCMonth() === month - 1 &&
-        date.getUTCDate() === day
-      ) {
-        rentedUntil = match[1] + '-' + match[2] + '-' + match[3];
-      }
-    }
+    rentedUntil = validateRentedUntil(data.rentedUntil);
   }
   if (status === 'rented' && !rentedUntil) {
     return { status: 'vacant', rentedUntil: null };
@@ -236,6 +242,10 @@ app.put('/api/status', function (req, res) {
 
   if (status === 'rented' && !rentedUntil) {
     return res.status(400).json({ error: 'rentedUntil is required when status is rented (YYYY-MM-DD)' });
+  }
+
+  if (status === 'rented' && !validateRentedUntil(rentedUntil)) {
+    return res.status(400).json({ error: 'rentedUntil must be a valid date with a 4-digit year (2000–2099)' });
   }
 
   try {

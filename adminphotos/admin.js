@@ -72,12 +72,48 @@
     }
   }
 
+  function isValidRentedUntil(value) {
+    if (!value || typeof value !== 'string') return false;
+    const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!match) return false;
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+    const day = Number(match[3]);
+    if (year < 2000 || year > 2099) return false;
+    const date = new Date(Date.UTC(year, month - 1, day));
+    return (
+      date.getUTCFullYear() === year &&
+      date.getUTCMonth() === month - 1 &&
+      date.getUTCDate() === day
+    );
+  }
+
+  function validateRentedUntilInput() {
+    const value = rentedUntilInput.value;
+    if (!value) {
+      rentedUntilInput.setCustomValidity('');
+      return true;
+    }
+    if (!isValidRentedUntil(value)) {
+      rentedUntilInput.setCustomValidity('Use a valid date with a 4-digit year (2000–2099).');
+      return false;
+    }
+    rentedUntilInput.setCustomValidity('');
+    return true;
+  }
+
   async function saveStatus() {
     const status = rentalStatus;
     const rentedUntil = status === 'rented' ? rentedUntilInput.value : null;
 
     if (status === 'rented' && !rentedUntil) {
       showMessage('Choose a "rented until" date.', 'error', statusMessageEl);
+      return;
+    }
+
+    if (status === 'rented' && !validateRentedUntilInput()) {
+      showMessage('Year must be 4 digits (2000–2099).', 'error', statusMessageEl);
+      rentedUntilInput.reportValidity();
       return;
     }
 
@@ -108,6 +144,9 @@
       rentedUntilInput.focus();
     }
   });
+
+  rentedUntilInput.addEventListener('input', validateRentedUntilInput);
+  rentedUntilInput.addEventListener('change', validateRentedUntilInput);
 
   saveStatusBtn.addEventListener('click', saveStatus);
 
