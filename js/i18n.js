@@ -58,7 +58,8 @@
       photo4: 'Back alley view from window',
       photo5: 'Bathroom',
       photo6: 'Building exterior',
-      schemaDescription: '45 sqm fixed-term rental apartment on the 8th floor near Shinjuku Gyoen Station. ¥200,000/month, utilities included, 6-month or 1-year lease.'
+      schemaDescription: '45 sqm fixed-term rental apartment on the 8th floor near Shinjuku Gyoen Station. ¥200,000/month, utilities included, 6-month or 1-year lease.',
+      rentedBanner: 'Currently rented until {date}'
     },
     ja: {
       title: '藤和新宿御苑コープII — Towa',
@@ -112,7 +113,8 @@
       photo4: '裏通りの眺望',
       photo5: 'バスルーム',
       photo6: '建物外観',
-      schemaDescription: '新宿御苑前駅徒歩すぐ、8階・45㎡の定期借家。月額¥200,000、光熱費込み、6ヶ月または1年契約。'
+      schemaDescription: '新宿御苑前駅徒歩すぐ、8階・45㎡の定期借家。月額¥200,000、光熱費込み、6ヶ月または1年契約。',
+      rentedBanner: '現在賃貸中（{date}まで）'
     }
   };
 

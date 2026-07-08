@@ -8,6 +8,8 @@ const SITE_ROOT = process.env.SITE_ROOT || path.join(__dirname, '..');
 const PHOTOS_DIR = path.join(SITE_ROOT, 'photos');
 const MANIFEST_PATH = path.join(__dirname, 'photos.json');
 const PUBLIC_MANIFEST = path.join(SITE_ROOT, 'photos.json');
+const STATUS_PATH = path.join(__dirname, 'status.json');
+const PUBLIC_STATUS = path.join(SITE_ROOT, 'status.json');
 
 const EXCLUDED = new Set(['line-qr.png']);
 const ALLOWED_EXT = new Set(['.jpg', '.jpeg', '.png', '.webp', '.svg']);
@@ -55,6 +57,66 @@ function writeManifest(photos) {
     }
     throw err;
   }
+}
+
+const DEFAULT_STATUS = { status: 'vacant', rentedUntil: null };
+
+function normalizeStatus(data) {
+  if (!data || typeof data !== 'object') {
+    return Object.assign({}, DEFAULT_STATUS);
+  }
+  const status = data.status === 'rented' ? 'rented' : 'vacant';
+  let rentedUntil = null;
+  if (status === 'rented' && data.rentedUntil) {
+    const match = String(data.rentedUntil).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (match) {
+      const year = Number(match[1]);
+      const month = Number(match[2]);
+      const day = Number(match[3]);
+      const date = new Date(Date.UTC(year, month - 1, day));
+      if (
+        date.getUTCFullYear() === year &&
+        date.getUTCMonth() === month - 1 &&
+        date.getUTCDate() === day
+      ) {
+        rentedUntil = match[1] + '-' + match[2] + '-' + match[3];
+      }
+    }
+  }
+  if (status === 'rented' && !rentedUntil) {
+    return { status: 'vacant', rentedUntil: null };
+  }
+  return { status, rentedUntil };
+}
+
+function readStatus() {
+  try {
+    if (fs.existsSync(STATUS_PATH)) {
+      const raw = fs.readFileSync(STATUS_PATH, 'utf8').trim();
+      if (raw) {
+        return normalizeStatus(JSON.parse(raw));
+      }
+    }
+  } catch (err) {
+    console.error('Failed to read status:', err.message);
+  }
+  writeStatus(DEFAULT_STATUS);
+  return Object.assign({}, DEFAULT_STATUS);
+}
+
+function writeStatus(status) {
+  const normalized = normalizeStatus(status);
+  const json = JSON.stringify(normalized, null, 2) + '\n';
+  try {
+    fs.writeFileSync(STATUS_PATH, json, 'utf8');
+    fs.writeFileSync(PUBLIC_STATUS, json, 'utf8');
+  } catch (err) {
+    if (err.code === 'EACCES') {
+      throw Object.assign(new Error('Permission denied writing status.json (run deploy to fix ownership)'), { status: 500 });
+    }
+    throw err;
+  }
+  return normalized;
 }
 
 function apiError(err, fallback) {
@@ -163,6 +225,28 @@ app.delete('/api/photos/:filename', function (req, res) {
   }
 });
 
+app.get('/api/status', function (_req, res) {
+  res.json(readStatus());
+});
+
+app.put('/api/status', function (req, res) {
+  const body = req.body || {};
+  const status = body.status === 'rented' ? 'rented' : 'vacant';
+  const rentedUntil = status === 'rented' ? body.rentedUntil : null;
+
+  if (status === 'rented' && !rentedUntil) {
+    return res.status(400).json({ error: 'rentedUntil is required when status is rented (YYYY-MM-DD)' });
+  }
+
+  try {
+    const saved = writeStatus({ status, rentedUntil });
+    res.json(saved);
+  } catch (err) {
+    console.error(err);
+    res.status(err.status || 500).json({ error: apiError(err, 'Save failed') });
+  }
+});
+
 app.put('/api/photos/order', function (req, res) {
   const order = req.body && req.body.order;
   if (!Array.isArray(order) || order.length === 0) {
@@ -197,6 +281,7 @@ app.use(function (err, _req, res, _next) {
 
 ensureDirs();
 readManifest();
+readStatus();
 
 app.listen(PORT, '127.0.0.1', function () {
   console.log('gyoenmae-api listening on 127.0.0.1:' + PORT);

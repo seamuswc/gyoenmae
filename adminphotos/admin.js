@@ -1,38 +1,50 @@
 (function () {
   const API = '/api/photos';
+  const STATUS_API = '/api/status';
   const listEl = document.getElementById('photo-list');
   const messageEl = document.getElementById('message');
+  const statusMessageEl = document.getElementById('status-message');
   const uploadInput = document.getElementById('upload-input');
   const uploadBtn = document.getElementById('upload-btn');
   const saveBtn = document.getElementById('save-order-btn');
+  const vacantBtn = document.getElementById('status-vacant');
+  const rentedBtn = document.getElementById('status-rented');
+  const rentedUntilField = document.getElementById('rented-until-field');
+  const rentedUntilInput = document.getElementById('rented-until');
+  const saveStatusBtn = document.getElementById('save-status-btn');
 
   let photos = [];
   let dragIndex = null;
   let orderDirty = false;
+  let rentalStatus = 'vacant';
 
-  function showMessage(text, type) {
-    messageEl.textContent = text;
-    messageEl.className = 'message visible ' + (type || 'info');
+  function showMessage(text, type, target) {
+    const el = target || messageEl;
+    if (!el) return;
+    el.textContent = text;
+    el.className = 'message visible ' + (type || 'info');
     if (type === 'success') {
       window.setTimeout(function () {
-        if (messageEl.textContent === text) {
-          messageEl.classList.remove('visible');
+        if (el.textContent === text) {
+          el.classList.remove('visible');
         }
       }, 3500);
     }
   }
 
-  function setOrderDirty(dirty) {
-    orderDirty = dirty;
-    if (saveBtn) {
-      saveBtn.disabled = !dirty;
-      saveBtn.textContent = dirty ? 'Save order' : 'Order saved';
+  function setRentalUi(status, rentedUntil) {
+    rentalStatus = status === 'rented' ? 'rented' : 'vacant';
+    vacantBtn.classList.toggle('active', rentalStatus === 'vacant');
+    rentedBtn.classList.toggle('active', rentalStatus === 'rented');
+    rentedUntilField.hidden = rentalStatus !== 'rented';
+    if (rentedUntil) {
+      rentedUntilInput.value = rentedUntil;
     }
   }
 
-  async function api(path, options) {
+  async function api(base, path, options) {
     const opts = Object.assign({ credentials: 'include' }, options || {});
-    const res = await fetch(API + (path || ''), opts);
+    const res = await fetch(base + (path || ''), opts);
     const text = await res.text();
     var data = {};
     if (text) {
@@ -49,6 +61,66 @@
       throw new Error(data.error || ('Request failed (' + res.status + ')'));
     }
     return data;
+  }
+
+  async function loadStatus() {
+    try {
+      const data = await api(STATUS_API, '');
+      setRentalUi(data.status, data.rentedUntil);
+    } catch (err) {
+      showMessage('Failed to load rental status: ' + err.message, 'error', statusMessageEl);
+    }
+  }
+
+  async function saveStatus() {
+    const status = rentalStatus;
+    const rentedUntil = status === 'rented' ? rentedUntilInput.value : null;
+
+    if (status === 'rented' && !rentedUntil) {
+      showMessage('Choose a "rented until" date.', 'error', statusMessageEl);
+      return;
+    }
+
+    saveStatusBtn.disabled = true;
+    showMessage('Saving status…', 'info', statusMessageEl);
+    try {
+      const data = await api(STATUS_API, '', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: status, rentedUntil: rentedUntil })
+      });
+      setRentalUi(data.status, data.rentedUntil);
+      showMessage('Rental status saved. Public site updated.', 'success', statusMessageEl);
+    } catch (err) {
+      showMessage('Save failed: ' + err.message, 'error', statusMessageEl);
+    } finally {
+      saveStatusBtn.disabled = false;
+    }
+  }
+
+  vacantBtn.addEventListener('click', function () {
+    setRentalUi('vacant');
+  });
+
+  rentedBtn.addEventListener('click', function () {
+    setRentalUi('rented', rentedUntilInput.value || null);
+    if (!rentedUntilInput.value) {
+      rentedUntilInput.focus();
+    }
+  });
+
+  saveStatusBtn.addEventListener('click', saveStatus);
+
+  function setOrderDirty(dirty) {
+    orderDirty = dirty;
+    if (saveBtn) {
+      saveBtn.disabled = !dirty;
+      saveBtn.textContent = dirty ? 'Save order' : 'Order saved';
+    }
+  }
+
+  async function apiPhotos(path, options) {
+    return api(API, path, options);
   }
 
   function render() {
@@ -132,7 +204,7 @@
 
   async function loadPhotos() {
     try {
-      const data = await api('');
+      const data = await apiPhotos('');
       photos = Array.isArray(data) ? data : (data.photos || []);
       render();
       setOrderDirty(false);
@@ -146,7 +218,7 @@
     saveBtn.disabled = true;
     showMessage('Saving order…', 'info');
     try {
-      const data = await api('/order', {
+      const data = await apiPhotos('/order', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ order: photos.map(function (p) { return p.filename; }) })
@@ -167,7 +239,7 @@
     }
     showMessage('Deleting…', 'info');
     try {
-      const data = await api('/' + encodeURIComponent(filename), { method: 'DELETE' });
+      const data = await apiPhotos('/' + encodeURIComponent(filename), { method: 'DELETE' });
       photos = data.photos || [];
       render();
       setOrderDirty(false);
@@ -183,7 +255,7 @@
     uploadBtn.disabled = true;
     showMessage('Uploading ' + file.name + '…', 'info');
     try {
-      const data = await api('', { method: 'POST', body: form });
+      const data = await apiPhotos('', { method: 'POST', body: form });
       photos = data.photos || photos;
       render();
       setOrderDirty(false);
@@ -215,5 +287,6 @@
     saveBtn.addEventListener('click', saveOrder);
   }
 
+  loadStatus();
   loadPhotos();
 })();

@@ -361,6 +361,22 @@ code {
 
 /* Footer */
 
+.rented-banner {
+  padding: 1.25rem 0;
+  background: var(--accent-light);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+}
+
+.rented-banner p {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
 .site-footer {
   padding: 2.5rem 0;
   border-top: 1px solid var(--border);

@@ -11,7 +11,7 @@ rsync -avz --exclude node_modules --exclude .git \
 ssh "${HOST}" bash -s <<EOF
 set -euo pipefail
 cd "${REMOTE_ROOT}/server" && npm install --omit=dev
-chown -R www-data:www-data "${REMOTE_ROOT}/photos" "${REMOTE_ROOT}/photos.json"
+chown -R www-data:www-data "${REMOTE_ROOT}/photos" "${REMOTE_ROOT}/photos.json" "${REMOTE_ROOT}/status.json"
 chown -R www-data:www-data "${REMOTE_ROOT}/server"
 cp "${REMOTE_ROOT}/deploy/nginx-gyoenmae.conf" /etc/nginx/sites-available/gyoenmae
 if [[ -f /etc/nginx/.htpasswd ]]; then

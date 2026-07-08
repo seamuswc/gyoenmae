@@ -14,8 +14,25 @@
   <div class="wrap">
     <header>
       <h1>Admin</h1>
-      <p class="status">Logged in via nginx</p>
+      <p class="login-status">Logged in via nginx</p>
     </header>
+
+    <section class="rental-status-section">
+      <h2>Rental status</h2>
+      <p class="note">Controls the banner on the public site above the contact section. Vacant hides the banner.</p>
+      <div id="status-message" class="message" role="status" aria-live="polite"></div>
+      <div class="status-controls">
+        <div class="status-toggle" role="group" aria-label="Rental status">
+          <button type="button" class="btn status-btn active" id="status-vacant" data-status="vacant">Vacant</button>
+          <button type="button" class="btn status-btn" id="status-rented" data-status="rented">Rented</button>
+        </div>
+        <label class="date-field" id="rented-until-field" hidden>
+          <span class="date-label">Rented until</span>
+          <input type="date" id="rented-until" name="rentedUntil">
+        </label>
+        <button type="button" class="btn btn-primary" id="save-status-btn">Save status</button>
+      </div>
+    </section>
 
     <section>
       <h2>Carousel photos</h2>

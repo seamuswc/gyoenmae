@@ -42,7 +42,7 @@ h1 {
   margin: 0 0 0.5rem;
 }
 
-.status {
+.login-status {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -53,12 +53,70 @@ h1 {
   border-radius: 999px;
 }
 
-.status::before {
+.login-status::before {
   content: "";
   width: 8px;
   height: 8px;
   border-radius: 50%;
   background: var(--accent);
+}
+
+.status-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem 1rem;
+}
+
+.status-toggle {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.status-btn {
+  border: none;
+  border-radius: 0;
+  padding: 0.5rem 1rem;
+  background: transparent;
+}
+
+.status-btn + .status-btn {
+  border-left: 1px solid var(--border);
+}
+
+.status-btn.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.status-btn.active:hover {
+  background: #243d33;
+  color: #fff;
+}
+
+.date-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+}
+
+.date-label {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.date-field input[type="date"] {
+  font-family: inherit;
+  font-size: 0.9rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink);
 }
 
 section {
