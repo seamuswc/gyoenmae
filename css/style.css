@@ -363,9 +363,9 @@ code {
 
 .rented-banner {
   padding: 1.25rem 0;
-  background: var(--accent-light);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+  background: #fdecea;
+  border-top: 1px solid #f0d4d0;
+  border-bottom: 1px solid #f0d4d0;
   text-align: center;
 }
 
@@ -374,7 +374,7 @@ code {
   font-family: var(--font-serif);
   font-size: 1.05rem;
   font-weight: 600;
-  color: var(--accent);
+  color: #7c2d2d;
 }
 
 .site-footer {
